@@ -1,7 +1,5 @@
-#include <Wire.h>
-
 // File TWI_GPS.cpp  Written by Greg Walker 01-Sep-23
-// last modified 16-Sep-2023
+// last modified 20-Sep-2023
 // Interface class for MediaTek MT3333 I2C GPS
 
 #include <Arduino.h>
