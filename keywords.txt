@@ -1,0 +1,31 @@
+#######################################
+# Syntax Coloring Map for TWI_GPS
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+NMEAmode	KEYWORD1
+NMEAresult	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+receiveMessage	KEYWORD2
+sendMessage	KEYWORD2
+ModeSet		KEYWORD2
+ModeGet		KEYWORD2
+Ping		KEYWORD2
+begin		KEYWORD2
+end		KEYWORD2
+TWI_GPS		KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+NMEA_MAX_MSG	LITERAL1
+GPS_ID		LITERAL1
