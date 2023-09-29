@@ -1,5 +1,5 @@
 //  File TWI_GPS.h  Written by Greg Walker 01-Sep-23
-//  Last modified 18-Sep-2023
+//  Last modified 29-Sep-2023
 // Interface class for MT3333 I2C GPS
 
 #include <Arduino.h>
@@ -25,7 +25,7 @@ public:
   NMEAresult  receiveMessage  (char MsgBuf[]);
   void        sendMessage     (char MsgBuf[]);
 
-  void        ModeSet(NMEAmode eDemand);
+  void        ModeSet(NMEAmode eDemand = NMEAbody);
   NMEAmode    ModeGet();
 
   bool	      begin(byte bTarget = GPS_ID);
@@ -57,6 +57,10 @@ private:
   char        read(bool* pBlockEnd = nullptr);  // indicates last TWI buffer
   void        TailShift(byte bTailIndex);       // residual bytes in our buffer
   void        Shuffle(byte chOneChar);          // append one byte to building
-};                                              // sentence
+                                                // sentence
+
+  void        PresetMembers();
+
+};
 
 ///////////////////////////////////////////////////////////////////////////////

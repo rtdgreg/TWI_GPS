@@ -78,9 +78,11 @@ NMEAmode.NMEAtext - just excludes the trailing <CR><LF>, option 2
 
 NMEAmode.NMEAfull - includes everything, option 3.
 
-By default the library delivers option 2, the visible text characters, but client code can change this with the code:-
+By default the library delivers option 1, the core body of the message, but client code can change this with the code:-
 
 void TWI_GPS::ModeSet(NMEAbody); to omit the redundant wrapper characters.
+
+At first sight the user programmer might expect the default form to be the full visible text, including the dollar, star and checksum, but excluding the carriage control characters.  The body form was chosen as a slight incentive to adopt the bare body because this library has already done the work of validating the outer wrapper. The wrapper's job is done.  The client is encouraged to accept that and leave the parsing task to analysing the real message content.
 
 That deals with the core functionality of this library.  There are, however a few incidental methods to deal with the general housekeeping.  We have:-
 

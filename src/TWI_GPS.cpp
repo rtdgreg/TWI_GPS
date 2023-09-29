@@ -1,5 +1,7 @@
+#include <Wire.h>
+
 // File TWI_GPS.cpp  Written by Greg Walker 01-Sep-23
-// last modified 20-Sep-2023
+// last modified 29-Sep-2023
 // Interface class for MediaTek MT3333 I2C GPS
 
 #include <Arduino.h>
@@ -264,7 +266,7 @@ bool TWI_GPS::Ping ()
 
 bool TWI_GPS::begin (byte bTarget)
 {
-	bool bReply;
+	bool bReply = false;
   Wire.begin();
 
   if(m_bTWIaddress == NULL)
@@ -275,10 +277,7 @@ bool TWI_GPS::begin (byte bTarget)
       bReply = Ping();
       if (bReply)
       {
-        m_bDLFpending     = true;
-        m_eMode           = NMEAtext;
-        m_eSearchState    = SEARCH;
-        m_bNMEAindex      = NULL;
+        PresetMembers();
         delay(5);
       }
       else 
@@ -292,11 +291,24 @@ bool TWI_GPS::begin (byte bTarget)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void TWI_GPS::PresetMembers()
+{
+  m_bDLFpending  = true;
+  m_eMode        = NMEAbody;
+  m_eSearchState = SEARCH;
+  m_bNMEAindex   = NULL;
+}
+///////////////////////////////////////////////////////////////////////////////
+
 void TWI_GPS::end() { m_bTWIaddress = NULL; }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TWI_GPS::TWI_GPS() { m_bTWIaddress = NULL; }  // constructor
+TWI_GPS::TWI_GPS() 
+{ 
+  m_bTWIaddress = NULL; 
+  PresetMembers();
+}  // constructor
 
 ///////////////////////////////////////////////////////////////////////////////
 
