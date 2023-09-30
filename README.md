@@ -170,8 +170,6 @@ The reader will realise this library makes no attempt to parse any of the messag
 
 For Arduino the [TinyGPS++ library](https://github.com/mikalhart/TinyGPSPlus) is a known proven parser.  Maintainer has confined his attentions to the stated mission of the TWI_GPS library.  As yet, no attempt has been made to feed the **TinyGPS++** library with messages delivered by TWI_GPS.  That will happen during the early life of the TWI_GPS library.  Consideration will be given to making a new parser if there is a serious prospect of providing a library that's sufficient for real world requirements and makes a significantly smaller claim on, in particular, the RAM it needs to do the job.
 
-
-
 [*SparkFun GPS Breakout - XA1110 (Qwiic) (SEN-14414)*](https://www.sparkfun.com/products/14414)
 
  [![SparkFun GPS Breakout - XA1110 (Qwiic)](https://cdn.sparkfun.com//assets/parts/1/2/3/4/0/14414-SparkFun_GPS_Breakout_-_XA1110__Qwiic_-01.jpg)](https://www.sparkfun.com/products/14414)
