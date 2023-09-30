@@ -109,15 +109,29 @@ There are, however a few incidental methods to deal with the general housekeepin
 ### Minimalist Coding Example
 
 ```
-void loop() 
+#include <TWI_GPS.h>
+TWI_GPS MyGPS;    // Construct the TWI_GPS object
+setup()
+{
+    Serial.begin(2000000);
+    MyGPS.begin();
+    Wire.begin(400000);
+    MyGPS.sendMessage("PMTK314,0,1,0,5,0");
+        // GNRMC report every fix. GNGGA report every 5 fixes
+    MyGPS.sendMessage("PMTK220,100"); // Fix every 100 msec
+}
+
+loop()
 {
   char  MsgBuf[NMEA_MAX_MSG];
   NMEAresult  eReply;
 
   while ((eReply = myGPS.receiveMessage(MsgBuf )) != NMEAoutofdata )
   {
-    ReportSentence(MsgBuf, eReply);
+    Serial.println(MsgBuf);
+    // Do whatever with message from GPS 
   }
+  // 
   delay(50);
 }
 ```
@@ -130,9 +144,33 @@ The first reason one might think of is it eliminates the need to use up either t
 
 In the opinion of the author, this benefit pales in significance to the effective use of the message buffering capability of the GPS. From observation of the MicroTek MT3333 GPS receiver can buffer several seconds worth of measurement data.  With an asynchronous serial connection, the GPS will send that to its host at a rate limited by the baud rate of the connection.  Then it becomes the respnsibility of the client code to catch all that data, or lose it.  With the TWI connection, the client can choose when to collect it from the GPS.  It doesn't have to weigh the compromise of a latency vs buffer size and baud rate.  A fast clock can deliver the data promptly, but the client has to provide the resources to catch it.  With this library, the client has the option to gather all the fix data until it's right up to date, or leave it in the GPS buffer store if it's got something more pressing to do before returning to play catch up.
 
-Reference
+### Reference
 
 For explanation of report messages from and command messages to the Microtek MT3333 GPS receiver please to MT3333 Platform NMEA Message Specification V1.07.pdf available by Google search on the internet. Please accept my apologies for not including a hyperlink - hopefully I will get the hang of that soon!
+
+### Maintainer
+
+This library code, in its initial form was created wholly by Greg Walker without reference to any other already available GPS libraries.
+
+It is maintained by Greg Walker - rtdgreg@gmail.com
+
+Please email Greg to report any problems or make suggestions for improvement.
+
+### Development Road Map
+
+In its first release, this library has been designed to work on a basic Arduino nano. That should mean it will work with any Atmega328 based board.
+
+Next step will be to support Arduino nano Every, followed by check out with Mega and Uno.  Then Arduino nano BLE 33.
+
+Please email maintainer if you have successfully used this library with any other Arduino not listed above.  Please email maintainer if you have an Arduino not listed above, have found difficulty with using it, and would like me to add support for your chosen Arduino.
+
+I have tried this library with I2C GPS receivers from Sparkfun and from Adafruit.  Without exception, they have worked just fine.  If you have problems integrating with an I2C GPS, please let me know.
+
+The reader will realise this library makes no attempt to parse any of the message bodies.  The mainatainer has adopted a rather blinkered approach to this development.  The mission has been to deliver validated NMEA sentences to the client code reliably and efficiently.  Maintainer does not aspire to creating a new parser when perfectly satisfactory libraries are already available to do that.
+
+For Arduino the [TinyGPS++ library](https://github.com/mikalhart/TinyGPSPlus) is a known proven parser.  Maintainer has confined his attentions to the stated mission of the TWI_GPS library.  As yet, no attempt has been made to feed the **TinyGPS++** library with messages delivered by TWI_GPS.  That will happen during the early life of the TWI_GPS library.  Consideration will be given to making a new parser if there is a serious prospect of providing a library that's sufficient for real world requirements and makes a significantly smaller claim on, in particular, the RAM it needs to do the job.
+
+
 
 [*SparkFun GPS Breakout - XA1110 (Qwiic) (SEN-14414)*](https://www.sparkfun.com/products/14414)
 
