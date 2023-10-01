@@ -117,7 +117,7 @@ setup()
 {
     Serial.begin(2000000);
     MyGPS.begin();
-    Wire.begin(400000);
+    Wire.setClock(400000);
     MyGPS.sendMessage("PMTK314,0,1,0,5,0");
         // GNRMC report every fix. GNGGA report every 5 fixes
     MyGPS.sendMessage("PMTK220,100"); // Fix every 100 msec
