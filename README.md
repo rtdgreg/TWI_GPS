@@ -6,7 +6,7 @@ This software provides a small footprint, reliable, high performance application
 
 At the interface, it delivers validated NMEA compliant report messages and accepts NMEA compliant command messages.  NMEA 0183 is a messaging structure first defined by the **National Marine Electronics Association** in 1983. NMEA 0183 messages are of the form:-
 
-<$><body><*><XX><crlf>
+$|body|*|XX|crlf where "$" is the fixed visible "dollar" start character, "body" is the core payload of the message, "*" is the fixed visible "asterisk" end of body indicator, "XX" is a two character hexadecimal checksum indicator, and "crlf" is the fixed non visible carriage control charater sequence, "carriage return" followed by "line feed".
 
 It is implemented as a c++ class of type TWI_GPS
 
