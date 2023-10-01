@@ -76,7 +76,7 @@ would be great.  But maybe, just maybe, there are some users who might want the 
 
 `$GPRMC,094330.000,A,3113.3156,N,12121.2686,E,0.51,193.93,171210,,,A*68`
 
-would be better.  Then again, some might want to have the controlcharacters included too.  Something like:-
+would be better.  Then again, some might want to have the control characters included too.  Something like:-
 
 `$GPRMC,094330.000,A,3113.3156,N,12121.2686,E,0.51,193.93,171210,,,A*68<CR><LF>`
 
