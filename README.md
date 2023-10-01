@@ -6,6 +6,8 @@ This software provides a small footprint, reliable, high performance application
 
 At the interface, it delivers validated NMEA compliant report messages and accepts NMEA compliant command messages.  NMEA 0183 is a messaging structure first defined by the **National Marine Electronics Association** in 1983. NMEA 0183 messages are of the form:-
 
+<$><body><*><XX><crlf>
+
 It is implemented as a c++ class of type TWI_GPS
 
 ## Installation
