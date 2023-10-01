@@ -12,7 +12,7 @@ It is implemented as a c++ class of type TWI_GPS
 
 TWI_GPS is available as a Zip file, in a format that meets requirements for libraries supported by Arduini IDE library manager.
 
-Available on GitHub from https://github.com/rtdgreg/TWI_GPS.git
+Available on GitHub from https://github.com/rtdgreg/TWI_GPS
 
 ## Usage
 
