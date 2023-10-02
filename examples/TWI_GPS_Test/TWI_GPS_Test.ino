@@ -8,7 +8,7 @@
 //#define NMEA_MESSAGE_SET "PMTK314,0,1,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1"
 #define   NMEA_MESSAGE_SET "PMTK314,0,1,0,5,0"
 //#define NMEA_MESSAGE_INTERVAL_MS  "PMTK220,100"
-#define NMEA_MESSAGE_INTERVAL_MS  "PMTK220,500"
+#define NMEA_MESSAGE_INTERVAL_MS  "PMTK220,100"
 
 const byte bMaxSentence = 83; // NMEA specifies 82 max, allow one more for
                               // trailing NULL

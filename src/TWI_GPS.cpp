@@ -1,7 +1,7 @@
 #include <Wire.h>
 
 // File TWI_GPS.cpp  Written by Greg Walker 01-Sep-23
-// last modified 29-Sep-2023
+// last modified 02-Oct-2023
 // Interface class for MediaTek MT3333 I2C GPS
 
 #include <Arduino.h>
@@ -50,14 +50,14 @@ bool TWI_GPS::Process_Character() // Known to be available.
 NMEAresult  TWI_GPS::ProcessCompletedMessage(char MsgBuf[])
 {
   NMEAresult    eReply  = NMEAoutofdata;
-  byte    bPushIndex    = NULL;
-  byte    bPullIndex    = NULL;
+  byte    bPushIndex    = 0;
+  byte    bPullIndex    = 0;
   bool    bStarFound    = false;
-  byte    bChecksum     = NULL;
+  byte    bChecksum     = 0;
 
   if(m_eMode > NMEAbody ) MsgBuf[bPushIndex++] = '$';
 
-  while (NMEAsentence[bPullIndex] > NULL)
+  while (NMEAsentence[bPullIndex] > 0)
   {
     if (NMEAsentence[bPullIndex] == '*') bStarFound = true;
     if (!bStarFound) bChecksum ^= NMEAsentence[bPullIndex];
@@ -85,7 +85,7 @@ NMEAresult  TWI_GPS::ProcessCompletedMessage(char MsgBuf[])
     MsgBuf[bPushIndex++] = '\r';
     MsgBuf[bPushIndex++] = '\n';
   }
-  MsgBuf[bPushIndex++] = NULL;
+  MsgBuf[bPushIndex++] = 0;
 
   TailShift (++bPullIndex); // Step pointer to 1st byte past message
   return eReply;
@@ -96,14 +96,14 @@ NMEAresult  TWI_GPS::ProcessCompletedMessage(char MsgBuf[])
 void TWI_GPS::TailShift(byte bTailIndex)  // Move what's left to beginning of
                                           // NMEAsentence
 {
-  NMEAsentence[m_bNMEAindex] = NULL;
+  NMEAsentence[m_bNMEAindex] = 0;
   m_eSearchState = SEARCH;
-  m_bNMEAindex = NULL;
-  while (NMEAsentence[bTailIndex] > NULL)
+  m_bNMEAindex = 0;
+  while (NMEAsentence[bTailIndex] > 0)
   {
     Shuffle(NMEAsentence[bTailIndex++]);
   }
-  while(Wire.available())
+  while(Wire.available() > 0)
   {
     Shuffle(Wire.read());
   }
@@ -136,7 +136,7 @@ void  TWI_GPS::Shuffle(byte chOneChar)
 
       case CKSM2:
         NMEAsentence[m_bNMEAindex++] = chOneChar; // to put 2nd checksum char
-        NMEAsentence[m_bNMEAindex++] = NULL;      // and a NULL separator        
+        NMEAsentence[m_bNMEAindex++] = 0;      // and a NULL separator        
         m_eSearchState = COMPLETE;
         break;
 
@@ -151,9 +151,9 @@ void  TWI_GPS::Shuffle(byte chOneChar)
 
 void  TWI_GPS::sendMessage(char MsgBuf[])
 {
-  byte    bChecksum = NULL;
-  byte    bTWIcounter = NULL;
-  byte    bMessageIndex = NULL;
+  byte    bChecksum = 0;
+  byte    bTWIcounter = 0;
+  byte    bMessageIndex = 0;
   size_t  uMessageLength = strlen(MsgBuf);
   if (uMessageLength >= NMEA_MAX_MSG - 6) uMessageLength = NMEA_MAX_MSG - 6;
   if ( uMessageLength >= 1)
@@ -185,9 +185,8 @@ void  TWI_GPS::PutByte(byte bItem, byte* p_bIndex)
   if (++*p_bIndex >= BUFFER_LENGTH)
   {
     Wire.endTransmission();
-    *p_bIndex = NULL;
-    //delay (1);  // I have seen written that GPS needs a bit of time here, but
-                  // seems to work just fine without.
+    *p_bIndex = 0;
+    delay (1);
     Wire.beginTransmission(m_bTWIaddress);
   }
 }
@@ -197,7 +196,7 @@ void  TWI_GPS::PutByte(byte bItem, byte* p_bIndex)
 
 char TWI_GPS::read(bool* pBlockEnd)
 {
-  byte bResult = NULL;
+  byte bResult = 0;
 
   if(m_bArrivedValid)
   {
@@ -208,7 +207,11 @@ char TWI_GPS::read(bool* pBlockEnd)
 
   if (bResult == LINE_FEED) m_bDLFpending = true;
 
-  if (pBlockEnd != nullptr) *pBlockEnd = !Wire.available();
+  if (pBlockEnd != nullptr)
+  {
+    *pBlockEnd = true;
+    if (Wire.available() > 0) *pBlockEnd = false;
+  }
   return bResult;
 }
 
@@ -216,18 +219,18 @@ char TWI_GPS::read(bool* pBlockEnd)
 
 byte TWI_GPS::available()     // Actually returns zero if TWI buffer empty
 {                             // and 1 if not empty
-  byte bCount = NULL;         // not how many bytes are held in TWI buffer
+  byte bCount = 0;            // not how many bytes are held in TWI buffer
 
   if(m_bDLFpending)//
   {
-    if(Wire.available() == NULL)
+    if(Wire.available() == 0)
     {
       Wire.requestFrom((uint8_t) m_bTWIaddress, (uint8_t) 1);
     }
     m_bArrived = Wire.read();
     if(m_bArrived == LINE_FEED)
     {
-      while(Wire.available() > 0) Wire.read();
+      while(Wire.available() > 0) Wire.read(); // Scrap anything else
     }
     else 
     {
@@ -241,7 +244,7 @@ byte TWI_GPS::available()     // Actually returns zero if TWI buffer empty
     bCount = 1;
     if(!m_bArrivedValid)
     {
-      if(Wire.available() == NULL)
+      if(Wire.available() == 0)
       {
         Wire.requestFrom((int) m_bTWIaddress, (int) BUFFER_LENGTH);
       }
@@ -251,14 +254,19 @@ byte TWI_GPS::available()     // Actually returns zero if TWI buffer empty
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Ping - Some Arduino boards have Arduino on top of Mbed and Mbed can not do a
+// I2C write with zero data (to check if the Slave acknowledges to its 
+// address). There is a fix to turn that into a read, but that might cause
+// trouble with the GPS.
 
 bool TWI_GPS::Ping ()
 {
   bool bSuccess = false;
-  byte bEndResult = NULL;
+  byte bEndResult = 0;
+
   Wire.beginTransmission(m_bTWIaddress);
   bEndResult = Wire.endTransmission();
-  if((bEndResult && !0x04) == NULL) bSuccess = true;
+  if((bEndResult == 0) || (bEndResult == 0x04)) bSuccess = true;
   return bSuccess;
 }
 
@@ -269,9 +277,9 @@ bool TWI_GPS::begin (byte bTarget)
 	bool bReply = false;
   Wire.begin();
 
-  if(m_bTWIaddress == NULL)
+  if(m_bTWIaddress == 0)
   {
-    if((bTarget > NULL) && (bTarget <= 127))
+    if((bTarget > 0) && (bTarget <= 127))
     {
       m_bTWIaddress     = bTarget;
       bReply = Ping();
@@ -282,7 +290,7 @@ bool TWI_GPS::begin (byte bTarget)
       }
       else 
       {
-        m_bTWIaddress     = NULL;
+        m_bTWIaddress     = 0;
       }
     }
   }
@@ -296,17 +304,17 @@ void TWI_GPS::PresetMembers()
   m_bDLFpending  = true;
   m_eMode        = NMEAbody;
   m_eSearchState = SEARCH;
-  m_bNMEAindex   = NULL;
+  m_bNMEAindex   = 0;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-void TWI_GPS::end() { m_bTWIaddress = NULL; }
+void TWI_GPS::end() { m_bTWIaddress = 0; }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 TWI_GPS::TWI_GPS() 
 { 
-  m_bTWIaddress = NULL; 
+  m_bTWIaddress = 0; 
   PresetMembers();
 }  // constructor
 
